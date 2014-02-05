@@ -36,9 +36,14 @@ class Route(TContext) : EventList!(void, TContext, string[string]) {
         }
 
         void execute(string uri, TContext context) {
-            //TODO: perform patterm matching magic here!
+            auto m = match(uri, _compiledPath);
             string[string] params;
-            if(_path == uri) {
+
+            if(m.captures.length > 0)
+            {
+                for(int i = 1; i < m.captures.length; i++) {
+                    params[_routeParams[i-1]] = m.captures[i];
+                }
                 _eventTrigger(context, params);
             }
         }
