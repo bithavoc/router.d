@@ -1,5 +1,6 @@
 import vapor;
 import std.stdio : writeln;
+import std.regex : match;
 
 class MyContext {
 
@@ -20,7 +21,12 @@ unittest {
 
     {
         auto route = new Route!MyContext("/project/:project_id/tasks/:id");
-        writeln(route.path);
-        writeln(route.routeParams);
+
+        assert(route.routeParams[0] == ":project_id");
+        assert(route.routeParams[1] == ":id");
+
+        auto m = match("/project/1/tasks/2", route.compiledPath);
+        assert(m.captures[1] == "1");
+        assert(m.captures[2] == "2");
     }
 }

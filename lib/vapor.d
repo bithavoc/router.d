@@ -3,7 +3,6 @@ module vapor;
 import events;
 import std.string : toUpper;
 import std.regex;
-import std.stdio;
 
 package:
 
