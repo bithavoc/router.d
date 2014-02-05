@@ -3,6 +3,7 @@ module vapor;
 import events;
 import std.string : toUpper;
 import std.regex;
+import std.stdio;
 
 package:
 
@@ -47,9 +48,8 @@ class Route(TContext) : EventList!(void, TContext, string[string]) {
         string[] extractRouteParams() {
             string[] keys;
 
-            auto m = matchAll(_path, regex(r"(:\w+)","gm"));
-            foreach(c; m.captures) {
-                keys ~= c;
+            foreach(m; match(_path, regex(r"(:\w+)", "gm"))){
+                keys ~= m.captures[1];
             }
             return keys;
         }
