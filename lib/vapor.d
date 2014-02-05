@@ -102,11 +102,8 @@ class VerbHandler(TContext) {
         }
 }
 
-public:
-
 class Router(TContext) {
     private:
-        char _separator;
         VerbHandler!TContext[string] _verbs;
 
         VerbHandler!TContext _getVerb(string verb) {
@@ -122,21 +119,14 @@ class Router(TContext) {
         }
 
     public:
-   this(char separator)
-       in {
-           assert(separator, "Separator is required");
-       }
-       body {
-           _separator = separator;
-       }
 
-    public EventList!(void, TContext, string[string]) map(string verb, string path) {
-        auto handler = _getVerb(verb);
-        return handler.route(path);
-    }
+        EventList!(void, TContext, string[string]) map(string verb, string path) {
+            auto handler = _getVerb(verb);
+            return handler.route(path);
+        }
 
-    void execute(string verb, string path, TContext context) {
-        auto handler = _getVerb(verb);
-        handler.execute(path, context);
-    }
+        void execute(string verb, string path, TContext context) {
+            auto handler = _getVerb(verb);
+            handler.execute(path, context);
+        }
 }

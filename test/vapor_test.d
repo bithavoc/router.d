@@ -9,7 +9,7 @@ class MyContext {
 unittest {
     {
         // root hit
-        auto router = new Router!MyContext('/');
+        auto router = new Router!MyContext;
         auto originalContext = new MyContext;
         MyContext routedContext = null;
         router.map("GET", "/") ^ (context, string[string] params) {
@@ -31,7 +31,7 @@ unittest {
     }
 
     {
-        auto router = new Router!MyContext('/');
+        auto router = new Router!MyContext;
         auto ctx = new MyContext;
 
         router.map("GET", "/project/:project_id/tasks/:id") ^ (context, string[string] params) {
