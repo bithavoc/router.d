@@ -2,6 +2,7 @@ module vapor;
 
 import events;
 import std.string : toUpper;
+import std.regex;
 
 package:
 
@@ -9,6 +10,8 @@ class Route(TContext) : EventList!(void, TContext, string[string]) {
     private:
 
         string _path;
+        Regex!char _compiledPath;
+        string[] _routeParams;
         EventList!(void, TContext, string[string]).Trigger _eventTrigger;
 
     public:
@@ -16,10 +19,20 @@ class Route(TContext) : EventList!(void, TContext, string[string]) {
         this(string path) {
             _path = path;
             _eventTrigger = this.own;
+            _routeParams = extractRouteParams;
+            _compiledPath = compilePathRegex;
         }
 
         @property string path() {
             return _path;
+        }
+
+        @property string[] routeParams() {
+            return _routeParams;
+        }
+
+        @property Regex!char compiledPath() {
+            return _compiledPath;
         }
 
         void execute(string uri, TContext context) {
@@ -28,6 +41,24 @@ class Route(TContext) : EventList!(void, TContext, string[string]) {
             if(_path == uri) {
                 _eventTrigger(context, params);
             }
+        }
+
+    private:
+        string[] extractRouteParams() {
+            string[] keys;
+
+            foreach(m; match(_path, regex(r"(:\w+)","gm"))){
+                foreach(c; m.captures) {
+                    keys ~= c;
+                }
+            }
+            return keys;
+        }
+
+        Regex!char compilePathRegex() {
+            auto replaced = replaceAll(_path, regex(r"(:\w+)","g"), "([^/?#]+)");
+            auto compiledRegexp = regex(replaced);
+            return compiledRegexp;
         }
 }
 
