@@ -17,4 +17,10 @@ unittest {
         router.execute("GET", "/", originalContext);
         assert(originalContext == routedContext, "The routed context is not the same the original context");
     }
+
+    {
+        auto route = new Route!MyContext("/project/:project_id/tasks/:id");
+        writeln(route.path);
+        writeln(route.routeParams);
+    }
 }
