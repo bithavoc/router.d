@@ -22,8 +22,8 @@ unittest {
     {
         auto route = new Route!MyContext("/project/:project_id/tasks/:id");
 
-        assert(route.routeParams[0] == ":project_id");
-        assert(route.routeParams[1] == ":id");
+        assert(route.routeParams[0] == "project_id");
+        assert(route.routeParams[1] == "id");
 
         auto m = match("/project/1/tasks/2", route.compiledPath);
         assert(m.captures[1] == "1");
