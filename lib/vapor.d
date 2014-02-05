@@ -47,10 +47,9 @@ class Route(TContext) : EventList!(void, TContext, string[string]) {
         string[] extractRouteParams() {
             string[] keys;
 
-            foreach(m; match(_path, regex(r"(:\w+)","gm"))){
-                foreach(c; m.captures) {
-                    keys ~= c;
-                }
+            auto m = matchAll(_path, regex(r"(:\w+)","gm"));
+            foreach(c; m.captures) {
+                keys ~= c;
             }
             return keys;
         }
