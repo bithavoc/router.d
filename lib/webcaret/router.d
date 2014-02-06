@@ -1,4 +1,4 @@
-module vapor;
+module webcaret.router;
 
 import events;
 import std.string : toUpper, toLower;
