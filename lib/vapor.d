@@ -1,7 +1,7 @@
 module vapor;
 
 import events;
-import std.string : toUpper;
+import std.string : toUpper, toLower;
 import std.regex;
 
 package:
@@ -102,6 +102,10 @@ class VerbHandler(TContext) {
         }
 }
 
+private template BootstrapVerb(string methodName) {
+    const char[] BootstrapVerb = "EventList!(void, TContext, string[string]) " ~ methodName.toLower ~ "(string path) { return this.map(\"" ~ methodName.toUpper ~ "\", path); }";
+}
+
 class Router(TContext) {
     private:
         VerbHandler!TContext[string] _verbs;
@@ -124,6 +128,11 @@ class Router(TContext) {
             auto handler = _getVerb(verb);
             return handler.route(path);
         }
+
+        mixin(BootstrapVerb!"GET");
+        mixin(BootstrapVerb!"HEAD");
+        mixin(BootstrapVerb!"POST");
+        mixin(BootstrapVerb!"PUT");
 
         void execute(string verb, string path, TContext context) {
             auto handler = _getVerb(verb);

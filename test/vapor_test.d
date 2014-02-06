@@ -40,4 +40,14 @@ unittest {
         };
         router.execute("GET", "/project/1/tasks/2", ctx);
     }
+    {
+        auto router = new Router!MyContext;
+        auto ctx = new MyContext;
+
+        router.get("/project/:project_id/tasks/:id") ^ (context, string[string] params) {
+          assert(params["project_id"] == "1");
+          assert(params["id"] == "2");
+        };
+        router.execute("GET", "/project/1/tasks/2", ctx);
+    }
 }
