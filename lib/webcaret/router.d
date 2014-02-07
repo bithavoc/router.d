@@ -6,13 +6,13 @@ import std.regex;
 
 package:
 
-class Route(TContext) : EventList!(void, TContext, string[string]) {
+class Route(TRequest: IRoutedRequest, TResponse) : EventList!(void, TRequest, TResponse) {
     private:
 
         string _path;
         Regex!char _compiledPath;
         string[] _routeParams;
-        EventList!(void, TContext, string[string]).Trigger _eventTrigger;
+        EventList!(void, TRequest, TResponse).Trigger _eventTrigger;
 
     public:
 
@@ -35,7 +35,7 @@ class Route(TContext) : EventList!(void, TContext, string[string]) {
             return _compiledPath;
         }
 
-        void execute(string uri, TContext context) {
+        void execute(string uri, TRequest request, TResponse response) {
             auto m = match(uri, _compiledPath);
             string[string] params;
 
@@ -44,7 +44,8 @@ class Route(TContext) : EventList!(void, TContext, string[string]) {
                 for(int i = 1; i < m.captures.length; i++) {
                     params[_routeParams[i-1]] = m.captures[i];
                 }
-                _eventTrigger(context, params);
+                request.params = params;
+                _eventTrigger(request, response);
             }
         }
 
@@ -67,10 +68,19 @@ class Route(TContext) : EventList!(void, TContext, string[string]) {
         }
 }
 
-class VerbHandler(TContext) {
+public:
+
+interface IRoutedRequest {
+    @property {
+        string[string] params();
+        void params(string[string] params);
+    }
+}
+
+class VerbHandler(TRequest : IRoutedRequest, TResponse) {
     private:
         string _verb;
-        Route!TContext[string] _routes;
+        Route!(TRequest, TResponse)[string] _routes;
 
     public:
 
@@ -84,47 +94,48 @@ class VerbHandler(TContext) {
             }
         }
 
-        Route!TContext route(string path) {
-            Route!TContext route = null;
+        Route!(TRequest, TResponse) route(string path) {
+            Route!(TRequest, TResponse) route = null;
             if(path in _routes) {
                 route = _routes[path];
             }
             if(route is null) {
-                route = _routes[path] = new Route!TContext(path);
+                route = _routes[path] = new Route!(TRequest, TResponse)(path);
             }
             return route;
         }
 
-        void execute(string path, TContext context) {
+        void execute(string path, TRequest request, TResponse response) {
             foreach(r; _routes) {
-                r.execute(path, context);
+                r.execute(path, request, response);
             }
         }
 }
 
 private template BootstrapVerb(string methodName) {
-    const char[] BootstrapVerb = "EventList!(void, TContext, string[string]) " ~ methodName.toLower ~ "(string path) { return this.map(\"" ~ methodName.toUpper ~ "\", path); }";
+    const char[] BootstrapVerb = "EventList!(void, TRequest, TResponse) " ~ methodName.toLower ~ "(string path) { return this.map(\"" ~ methodName.toUpper ~ "\", path); }";
 }
 
-class Router(TContext) {
-    private:
-        VerbHandler!TContext[string] _verbs;
 
-        VerbHandler!TContext _getVerb(string verb) {
+class Router(TRequest : IRoutedRequest, TResponse) {
+    private:
+        VerbHandler!(TRequest, TResponse)[string] _verbs;
+
+        VerbHandler!(TRequest, TResponse) _getVerb(string verb) {
             string normalizedVerb = verb.toUpper;
-            VerbHandler!TContext handler = null;
+            VerbHandler!(TRequest, TResponse) handler = null;
             if(normalizedVerb in _verbs) {
                 handler = _verbs[normalizedVerb];
             }
             if(handler is null) {
-                handler = _verbs[normalizedVerb] = new VerbHandler!TContext(normalizedVerb);
+                handler = _verbs[normalizedVerb] = new VerbHandler!(TRequest, TResponse)(normalizedVerb);
             }
             return handler;
         }
 
     public:
 
-        EventList!(void, TContext, string[string]) map(string verb, string path) {
+        EventList!(void, TRequest, TResponse) map(string verb, string path) {
             auto handler = _getVerb(verb);
             return handler.route(path);
         }
@@ -134,8 +145,8 @@ class Router(TContext) {
         mixin(BootstrapVerb!"POST");
         mixin(BootstrapVerb!"PUT");
 
-        void execute(string verb, string path, TContext context) {
+        void execute(string verb, string path, TRequest request, TResponse response) {
             auto handler = _getVerb(verb);
-            handler.execute(path, context);
+            handler.execute(path, request, response);
         }
 }
