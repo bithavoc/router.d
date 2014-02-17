@@ -27,9 +27,10 @@ webcaret-router: lib/webcaret/*.d deps/events.d
 
 deps/events.d:
 	@echo "Compiling deps/events.d"
-	git submodule update --init --recursive --remote deps/events.d
+	git submodule update --init deps/events.d
 	mkdir -p out
 	mkdir -p out/di
+	DEBUG=${DEBUG} $(MAKE) -C deps/events.d clean
 	DEBUG=${DEBUG} $(MAKE) -C deps/events.d
 	cp deps/events.d/out/events.d.a out/
 	cp -r deps/events.d/out/events/* out/di
