@@ -10,18 +10,18 @@ endif
 ifeq (${OS_NAME},Darwin)
 	DFLAGS+=-L-framework -LCoreServices 
 endif
-lib_build_params=../out/webcaret-router.o ../out/events.d.a -I../out/di
-build: webcaret-router
+lib_build_params=../out/router.o ../out/events.d.a -I../out/di
+build: router
 
-test: test/*.d webcaret-router
-	$(DC) -ofout/tests.app -main -unittest -Iout/di out/webcaret-router.a out/events.d.a test/*.d $(DFLAGS)
+test: test/*.d router
+	$(DC) -ofout/tests.app -main -unittest -Iout/di out/router.a out/events.d.a test/*.d $(DFLAGS)
 	chmod +x out/tests.app
 	out/tests.app
 
-webcaret-router: lib/webcaret/*.d deps/events.d
+router: lib/*.d deps/events.d
 	mkdir -p out
-	cd lib; $(DC) -Hd../out/di/ -of$(lib_build_params) -op -c webcaret/*.d $(DFLAGS)
-	ar -r out/webcaret-router.a out/webcaret-router.o
+	cd lib; $(DC) -Hd../out/di/ -of$(lib_build_params) -op -c *.d $(DFLAGS)
+	ar -r out/router.a out/router.o
 
 .PHONY: clean
 

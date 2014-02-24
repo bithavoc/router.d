@@ -1,4 +1,4 @@
-module webcaret.router;
+module router;
 
 import events;
 import std.string : toUpper, toLower;

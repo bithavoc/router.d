@@ -1,0 +1,13 @@
+{
+	"name": "router",
+	"description": "Web Router for D",
+    "license": "MIT",
+    "targetType": "library",
+	"copyright": "Copyright © 2013-2014, heapsource.com",
+	"authors": ["heapsource"],
+    "importPaths": ["lib"],
+    "sourcePaths": ["lib"],
+	"dependencies": {
+        "events": "~master"
+	}
+}

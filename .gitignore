@@ -1,2 +1,4 @@
 /out
 /deps/events.d
+/.dub
+/librouter.a

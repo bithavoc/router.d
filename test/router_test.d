@@ -1,4 +1,4 @@
-import webcaret.router;
+import router;
 import std.stdio : writeln;
 import std.regex : match;
 
